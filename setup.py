@@ -6,6 +6,5 @@ setup(name='ln_graph_utils',
       version='1.0',
       description='Common LN Graph Utils I use.',
       author='davis7',
-      packages=["networkx"],
+      install_requires=["networkx"],
       )
-
