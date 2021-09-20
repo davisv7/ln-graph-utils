@@ -111,15 +111,15 @@ def has_minimum_degree(g, node: str) -> bool:
     return g.degree(node) >= minimum_degree
 
 
-def has_minimum_capacity(channel: Dict[str, Any]) -> bool:
+def has_minimum_capacity(channel: Dict[str, Any], minimum_capacity: int) -> bool:
     """
     Given a channel, determine if that channel has a minimum capacity.
     Capacity represents the maximum amount of sats a channel can SEND/RECEIVE/FORWARD, assuming correct liquidity.
     :param channel: dictionary representing a channel, including capacity information
+    :param minimum_capacity: int defining minimum capacity of a given channel
     :return:
     bool representing whether channel has some minimum capacity
     """
-    minimum_capacity = 1_000_000
     channel_capacity = int(channel['capacity'])
     return channel_capacity >= minimum_capacity
 
@@ -146,19 +146,6 @@ def has_both_active_policies(channel: Dict[str, Any]):
     return not n1_policy["disabled"] and not n2_policy["disabled"]
 
 
-def channel_filter(channel: Dict[str, Any]) -> bool:
-    """
-    Given a channel, determine whether that channel has certain properties:
-        - channel has some minimum capacity
-        - both channel policies are defined
-        - both channel policies are active
-    :param channel: dictionary representing a channel, including capacity and policy information
-    :return:
-    bool representing whether channel has all required properties
-    """
-    return has_minimum_capacity(channel) and has_both_node_policies(channel) and has_both_active_policies(channel)
-
-
 def clean_nodes(nodes: List[Dict], json_filename: str) -> List[Dict]:
     """
     Given a list of nodes and a json filename, filter for nodes that have not been updated recently.
@@ -183,13 +170,25 @@ def get_pubkeys(nodes: List[Dict]) -> List[str]:
     return [node["pub_key"] for node in nodes]
 
 
-def clean_edges(edges: List[Dict]) -> List[Dict]:
+def clean_edges(edges: List[Dict], config) -> List[Dict]:
     """
-    Given a list of edges and their attributes, filter for channels that do not meet requirements.
+    Given a list of edges and their attributes, filter for channels that do not meet requirements:
+    - channel has some minimum capacity
+    - both channel policies are defined
+    - both channel policies are active
     :param edges: list of edges and their attributes
+    :param config: settings in regard to how to filter edges
     :return:
     list of edges that meet certain requirements
     """
+    capacity = config.getint("minimum_capacity")
+
+    def channel_filter(channel):
+        return all([
+            has_minimum_capacity(channel, capacity),
+            has_both_node_policies(channel),
+            has_both_active_policies(channel)])
+
     return list(filter(channel_filter, edges))
 
 
