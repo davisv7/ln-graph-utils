@@ -184,10 +184,9 @@ def clean_edges(edges: List[Dict], config) -> List[Dict]:
     capacity = config.getint("minimum_capacity")
 
     def channel_filter(channel):
-        return all([
-            has_minimum_capacity(channel, capacity),
-            has_both_node_policies(channel),
-            has_both_active_policies(channel)])
+        return has_minimum_capacity(channel, capacity) and \
+               has_both_node_policies(channel) and \
+               has_both_active_policies(channel)
 
     return list(filter(channel_filter, edges))
 
