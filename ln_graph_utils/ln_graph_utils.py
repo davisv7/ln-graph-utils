@@ -202,8 +202,9 @@ def get_channels_with_attrs(edges: List[Dict]) -> List[Tuple[str, str, Dict]]:
     channels = []
     for edge in edges:
         n1_weight, n2_weight = channel_fee_function(edge)
-        edge1 = (edge['node1_pub'], edge['node2_pub'], {"cost": n1_weight})
-        edge2 = (edge['node2_pub'], edge['node1_pub'], {"cost": n2_weight})
+        capacity = int(edge['capacity'])
+        edge1 = (edge['node1_pub'], edge['node2_pub'], {"cost": n1_weight, "capacity": capacity})
+        edge2 = (edge['node2_pub'], edge['node1_pub'], {"cost": n2_weight, "capacity": capacity})
         channels.extend([edge1, edge2])
     return channels
 
