@@ -80,6 +80,10 @@ def channel_fee_function(channel: Dict[str, Any]) -> Tuple[float, float]:
     node1_fee_sats = node1_fee_mmsats / sats_per_mmsats
     node2_fee_sats = node2_fee_mmsats / sats_per_mmsats
 
+    # prevent channels with 0 fees
+    node1_fee_sats = max(0.1, node1_fee_sats)
+    node2_fee_sats = max(0.1, node2_fee_sats)
+
     return node1_fee_sats, node2_fee_sats
 
 
