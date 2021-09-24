@@ -65,9 +65,9 @@ def channel_fee_function(channel: Dict[str, Any]) -> Tuple[float, float]:
     node1_fee_sats: float representing fee in sats to forward payment from node 1 to node 2
     node2_fee_sats: float representing fee in sats to forward payment from node 2 to node 1
     """
-    payment_amount = 1_000_000
-    mmsats_per_msats = 1_000
-    sats_per_mmsats = 1_000_000
+    payment_amount = 100e3
+    mmsats_per_msats = 1e3
+    sats_per_mmsats = 1e6
 
     n1_scaling_fee_rate = int(channel['node1_policy']['fee_rate_milli_msat'])
     n1_base_fee_rate = int(channel['node1_policy']['fee_base_msat']) * mmsats_per_msats
@@ -191,7 +191,7 @@ def clean_edges(edges: List[Dict], config) -> List[Dict]:
     return list(filter(channel_filter, edges))
 
 
-def get_channels_with_fees(edges: List[Dict]) -> List[Tuple[str, str, Dict]]:
+def get_channels_with_attrs(edges: List[Dict]) -> List[Tuple[str, str, Dict]]:
     """
     Given a list of edges and their attributes, calculate the cost to forward payments in either direction,
     and create a list of tuples as such: [(u pub_key, v_pub_key, cost),...].
