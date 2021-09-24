@@ -201,10 +201,10 @@ def get_channels_with_attrs(edges: List[Dict]) -> List[Tuple[str, str, Dict]]:
     """
     channels = []
     for edge in edges:
-        n1_weight, n2_weight = channel_fee_function(edge)
+        n1_cost, n2_cost = channel_fee_function(edge)
         capacity = int(edge['capacity'])
-        edge1 = (edge['node1_pub'], edge['node2_pub'], {"cost": n1_weight, "capacity": capacity})
-        edge2 = (edge['node2_pub'], edge['node1_pub'], {"cost": n2_weight, "capacity": capacity})
+        edge1 = (edge['node1_pub'], edge['node2_pub'], {"cost": n1_cost, "capacity": capacity})
+        edge2 = (edge['node2_pub'], edge['node1_pub'], {"cost": n2_cost, "capacity": capacity})
         channels.extend([edge1, edge2])
     return channels
 
@@ -243,16 +243,19 @@ def save_graph(g, json_filename: str) -> None:
 
 def simplify_graph(multidi_g):
     """
-    Given a MultiDiGraph, create a DiGraph such that if a pair of nodes has more than one edge between them,
-    the edge with the minimum weight is retained.
+    Converts a MultiDiGraph into a simple DiGraph. If a pair of nodes has more than one edge between them,
+    the edge with the maximum cost is retained. According to Alex Bosworth, with parallel channels,
+    only the higher fee policy is considered. The capacities are combined.
     :param multidi_g: NetworkX MultiDiGraph
     :return: NetworkX DiGraph
     """
     di_g = nx.DiGraph()
     for u, v, data in multidi_g.edges(data=True):
-        w = data['weight']
+        w = data['cost']
+        c = data['capacity']
         if di_g.has_edge(u, v):
-            di_g[u][v]['weight'] = min(di_g[u][v]['weight'], w)
+            di_g[u][v]['cost'] = max(di_g[u][v]['cost'], w)
+            di_g[u][v]['capacity'] += c
         else:
-            di_g.add_edge(u, v, weight=w)
+            di_g.add_edge(u, v, cost=w, capacity=c)
     return di_g
