@@ -128,6 +128,19 @@ def has_minimum_capacity(channel: Dict[str, Any], minimum_capacity: int) -> bool
     return channel_capacity >= minimum_capacity
 
 
+def has_maximum_capacity(channel: Dict[str, Any], maximum_capacity: int) -> bool:
+    """
+    Given a channel, determine if that channel has a minimum capacity.
+    Capacity represents the maximum amount of sats a channel can SEND/RECEIVE/FORWARD, assuming correct liquidity.
+    :param channel: dictionary representing a channel, including capacity information
+    :param maximum_capacity: int defining maximum capacity of a given channel
+    :return:
+    bool representing whether channel has some minimum capacity
+    """
+    channel_capacity = int(channel['capacity'])
+    return channel_capacity <= maximum_capacity
+
+
 def has_both_node_policies(channel: Dict[str, Any]) -> bool:
     """
     Given a channel, determine if both nodes involved in that channel have well-defined policies.
@@ -185,10 +198,12 @@ def clean_edges(edges: List[Dict], config) -> List[Dict]:
     :return:
     list of edges that meet certain requirements
     """
-    capacity = config.getint("minimum_capacity")
+    min_capacity = config.getint("minimum_capacity")
+    max_capacity = config.getint("minimum_capacity")
 
     def channel_filter(channel):
-        return has_minimum_capacity(channel, capacity) and \
+        return has_minimum_capacity(channel, min_capacity) and \
+               has_maximum_capacity(channel, max_capacity) and \
                has_both_node_policies(channel) and \
                has_both_active_policies(channel)
 
