@@ -199,7 +199,7 @@ def clean_edges(edges: List[Dict], config) -> List[Dict]:
     list of edges that meet certain requirements
     """
     min_capacity = config.getint("minimum_capacity")
-    max_capacity = config.getint("minimum_capacity")
+    max_capacity = config.getint("maximum_capacity")
 
     def channel_filter(channel):
         return has_minimum_capacity(channel, min_capacity) and \
